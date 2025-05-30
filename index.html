@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+<style>
+/* Reset styles */
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: Arial, sans-serif;
+}
+body {
+background-color: #f5f5f5;
+display: flex;
+justify-content: center;
+align-items: center;
+height: 100vh;
+}
+/* Sidebar styles */
+.sidebar {
+width: 250px;
+background-color: #202020;
+color: #fff;
+padding: 20px;
+height: 100vh;
+position: fixed;
+left: 0;
+top: 0;
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+}
+.sidebar h2 {
+font-size: 24px;
+margin-bottom: 20px;
+}
+.sidebar ul {
+list-style: none;
+width: 100%;
+}
+.sidebar ul li {
+padding: 10px;
+cursor: pointer;
+border-radius: 5px;
+transition: background 0.3s;
+}
+.sidebar ul li:hover {
+background-color: #333333;
+}
+/* Main content styles */
+.main-content {
+margin-left: 270px;
+padding: 20px;
+width: calc(100% - 270px);
+}
+.main-content h1 {
+font-size: 24px;
+margin-bottom: 20px;
+color: #333;
+}
+.balance-info {
+font-size: 18px;
+color: #555;
+margin-bottom: 20px;
+}
+/* Button styles */
+button {
+padding: 10px 20px;
+border: none;
+background-color: #333;
+color: #fff;
+border-radius: 5px;
+cursor: pointer;
+margin-right: 10px;
+}
+button:hover {
+background-color: #555;
+}
+/* Parking slots styles */
+.parking-slots {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+gap: 10px;
+margin-top: 20px;
+}
+.slot {
+background-color: #e0e0e0;
+border: 2px solid #ccc;
+padding: 20px;
+display: flex;
+align-items: center;
+justify-content: center;
+border-radius: 10px;
+position: relative;
+}
+.slot.occupied {
+background-color: #ec0d0d;
+color: #fff;
+font-weight: bold;
+}
+.slot.empty {
+background-color: #10cf46;
+}
+.slot-text {
+font-size: 16px;
+}
+.car-icon {
+position: absolute;
+top: 5px;
+right: 5px;
+font-size: 12px;
+color: #333;
+}
+/* Payment gateway styles */
+.payment-gateway {
+display: none;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(0, 0, 0, 0.5);
+justify-content: center;
+align-items: center;
+}
+.payment-gateway-content {
+background-color: #fff;
+padding: 20px;
+border-radius: 10px;
+width: 300px;
+position: relative;
+}
+.payment-gateway-content h2 {
+margin-bottom: 20px;
+}
+.payment-gateway-content input {
+width: 100%;
+padding: 10px;
+margin-bottom: 10px;
+border: 1px solid #ccc;
+border-radius: 5px;
+}
+.payment-gateway-content button {
+width: 100%;
+padding: 10px;
+border: none;
+background-color: #333;
+color: #fff;
+border-radius: 5px;
+cursor: pointer;
+}
+.payment-gateway-content button:hover {
+background-color: #555;
+}
+.close-button {
+position: absolute;
+top: 10px;
+right: 10px;
+cursor: pointer;
+font-size: 20px;
+}
+/* Loading animation */
+.loading {
+display: none;
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+font-size: 24px;
+color: #333;
+}
+.timer {
+position: fixed;
+top: 20px;
+right: 20px;
+background-color: #333;
+color: #fff;
+padding: 10px 20px;
+border-radius: 5px;
+display: none; /* Initially hidden */
+font-size: 18px;
+}
+</style>
+</head>
+<body>
+<div class="sidebar">
+<h2>Parking Management</h2>
+<ul>
+<li>Dashboard</li>
+<li>Allotment</li>
+<li>Users</li>
+<li>Payments</li>
+<li>Report</li>
+<li>Settings</li>
+</ul>
+</div>
+<div class="main-content">
+<h1>Welcome, <%= username %></h1>
+<div class="balance-info">Remaining Balance: <span id="balance"><%= balance%></span></div>
+<div>
+<button id="recharge-button">Recharge</button>
+<button>Reserve a parking slot in advance</button>
+</div>
+<h3>Empty Slots</h3>
+<!--<div class="parking-slots">
+<% emptyslots.forEach(function(slot) { %>
+<div class="slot empty">
+<span class="slot-text"><%= slot %></span>
+</div>
+<% }); %>
+</div> -->
+<div class="parking-slots">
+<% for (let i = 1; i <= 20; i++) { %>
+<div class="slot <% if (emptyslots.includes(String(i))) { %> empty <% } else { %>occupied <% } %>">
+<span class="slot-text"><%= i %></span>
+<div class="car-icon">�</div>
+</div>
+<% } %>
+</div>
+</div>
+<div class="timer" id="timer">Elapsed Time: <span id="elapsed-time">0</span>seconds</div>
+<div class="payment-gateway" id="payment-gateway">
+<div class="payment-gateway-content">
+<span class="close-button" id="close-button">&times;</span>
+<h2>Recharge</h2>
+<input type="text" id="username" placeholder="Username" value="<%= username%>">
+<input type="number" id="amount" placeholder="Amount">
+<button id="add-money-button">Add Money</button>
+<div class="loading" id="loading">Loading...</div>
+</div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+let startTime;
+let timerInterval;
+let timeOut;
+const timerElement = document.getElementById("timer");
+const elapsedTimeElement = document.getElementById("elapsed-time");
+// Listen for the 'start' message to begin the timer
+socket.on("start", () => {
+clearTimeout(timeOut);
+startTime = Date.now();
+timerElement.style.display = "block"; // Show timer
+// Update timer every second
+timerInterval = setInterval(() => {
+//const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+const elapsedMins = Math.floor((Date.now()-startTime)/1000*60)
+elapsedTimeElement.innerText = elapsedMins;
+}, 1000);
+});
+// Listen for the 'exit' message to stop the timer
+socket.on("exit", (data) => {
+clearInterval(timerInterval); // Stop updating timer
+timerElement.innerText = "HAVE A SAFE JOURNEY";
+//timeOut = setTimeout(()=>{
+timerElement.style.display = "none";
+//},1000)
+document.getElementById("balance").innerText = data;
+// Hide timer
+});
+socket.on('message', (data) => {
+console.log('Received message:', data);
+});
+/*socket.on('emptySlots', (array) => {
+let slotDivs = document.getElementsByClassName("slot");
+for (let i = 0; i < array.length; i++) {
+//console.log(array[i]._id);
+if(array.includes(slotDivs.item(i).span.innerText))slotDivs.item.style.backgroundColor
+= "#10cf46";
+else slotDivs.item.style.backgroundColor = "#ec0d0d";
+}
+});*/
+socket.on('emptySlots', (array) => {
+let slotDivs = document.getElementsByClassName("slot");
+for (let i = 0; i < slotDivs.length; i++) {
+let slotId = slotDivs[i].querySelector("span").innerText; // assuming there's a <span> withID inside each slotDiv
+if (array.includes(slotId)) {
+slotDivs[i].style.backgroundColor = "#10cf46"; // Green color for empty slots
+} else {
+slotDivs[i].style.backgroundColor = "#ec0d0d"; // Red color for occupied slots
+}
+}
+});
+/*socket.on('remainingbalance',(rembalance)=>{
+document.getElement.id("balance").innerText = rembalance;
+});*/
+// JavaScript for payment gateway
+const rechargeButton = document.getElementById('recharge-button');
+const paymentGateway = document.getElementById('payment-gateway');
+const closeButton = document.getElementById('close-button');
+const addMoneyButton = document.getElementById('add-money-button');
+const loading = document.getElementById('loading');
+rechargeButton.addEventListener('click', () => {
+paymentGateway.style.display = 'flex';
+});
+closeButton.addEventListener('click', () => {
+paymentGateway.style.display = 'none';
+});
+addMoneyButton.addEventListener('click', () => {
+const username = document.getElementById('username').value;
+const amount =
+Number(document.getElementById('amount').value)+Number(document.getElementById('balance').innerText);
+//document.getElementById('balance').innerText=amount;
+console.log(JSON.stringify({ username, amount }));
+if (username && amount) {
+loading.style.display = 'block';
+fetch('/recharge', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify({ username, amount })
+})
+.then(response => response.json())
+.then(data => {
+loading.style.display = 'none';
+paymentGateway.style.display = 'none';
+//alert('Recharge successful!');
+// Optionally, update the balance on the page
+document.getElementById("balance").innerText = data.balance;
+})
+.catch(error => {
+loading.style.display = 'none';
+alert('Error: ' + error.message);
+});
+} else {
+alert('Please enter both username and amount.');
+}
+});
+</script>
+</body>
+</html>
