@@ -9,7 +9,7 @@ const server = http.createServer(app);
 const io = new Server(server);
 const port = 3000;
 let event = 0;
-const url = "mongodb+srv://ashish4684:1P3awqKrKIVf02aU@iot-smartparking.g5z3i.mongodb.net/?retryWrites=true&w=majority&appName=IOT-SMARTPARKING";
+const url = "";
 const client = new MongoClient(url);
 io.on("connection",async (socket_client)=>{
 console.log(`a user connected with id: ${socket_client.id}`);
