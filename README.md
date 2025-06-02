@@ -65,24 +65,24 @@ An intelligent, IoT-enabled parking management system designed to streamline urb
 
 ## 📷 Demo & Snapshots
  
->  Circuit Diagrams | Parking Lot Model | Dashboard View  
+>  Circuit Diagrams | Parking Lot Model | Working Model Demo Link  
 
 ###  Circuit Diagrams
 
-![Circuit_Diagarm](Circuit_Diagarm1.jpg)
+![Circuit_Diagarm](assets/Circuit_Diagram1.png)
 
-![Circuit_Diagarm](Circuit_Diagarm2.jpg)
+![Circuit_Diagarm](assets/Circuit_Diagram2.png)
 
 ###  Parking Lot Model
 
-![Parking Lot Model](Parking_Lot_Model1.jpg)
+![Parking Lot Model](assets/Parking_Lot_Model1.png)
 
-![Parking Lot Model](Parking_Lot_Model2.jpg)
+![Parking Lot Model](assets/Parking_Lot_Model2.png)
 
 
-###  Dashboard View
+###  Working Model Demo Link
 
-![Dashboard View](https://drive.google.com/uc?export=view&id=1_t03qnAILrzN3omnhKMwBxO4FxloYT4H)
+[![View the Working of The Model](https://drive.google.com/uc?export=view&id=1_t03qnAILrzN3omnhKMwBxO4FxloYT4H)](https://drive.google.com/file/d/1_t03qnAILrzN3omnhKMwBxO4FxloYT4H/view?usp=sharing)
 
 ---
 
