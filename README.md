@@ -13,8 +13,8 @@ An intelligent, IoT-enabled parking management system designed to streamline urb
 -  **Wireless Data Transmission**  
   Slot data is transmitted using Wi-Fi/Bluetooth modules (e.g., ESP8266, NodeMCU).
 
--  **User Interface (Optional)**  
-  Basic web/mobile UI to show slot availability (if implemented).
+-  **User Interface**  
+  Basic web UI to show slot availability.
 
 -  **Scalable & Modular**  
   Easily extendable for more slots or advanced features like payment & reservation.
